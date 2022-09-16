@@ -5,14 +5,14 @@
  * @docs        :: https://sailsjs.com/docs/concepts/extending-sails/hooks
  */
 
-const addDeletedAtToCriteria = (criteria, deletedAt, pk) => {
+const addDeletedAtToCriteria = (criteria, deleted_at, pk) => {
   if (!criteria) {
     criteria = {};
   } else if (typeof criteria !== 'object' && pk) {
     criteria = { [pk]: criteria };
   }
 
-  (criteria.where || criteria).deletedAt = deletedAt;
+  (criteria.where || criteria).deleted_at = deleted_at;
 
   return criteria;
 };
@@ -61,9 +61,9 @@ module.exports = function defineSoftDeleteHook(sails) {
     },
 
     _configureModel (Model) {
-      // Add deletedAt attribute to model
-      if (!Model.attributes.deletedAt) {
-        Model.attributes.deletedAt = {
+      // Add deleted_at attribute to model
+      if (!Model.attributes.deleted_at) {
+        Model.attributes.deleted_at = {
           type: 'number',
           allowNull: true,
           required: false,
@@ -74,7 +74,7 @@ module.exports = function defineSoftDeleteHook(sails) {
       const { find, findOne, destroy, destroyOne, update, updateOne } = Model;
 
       /**
-       * Overwrite find to add { deletedAt: null } to criteria
+       * Overwrite find to add { deleted_at: null } to criteria
        */
       Model.find = function (criteria) {
         criteria = addDeletedAtToCriteria(criteria, null);
@@ -82,7 +82,7 @@ module.exports = function defineSoftDeleteHook(sails) {
       };
 
       /**
-       * Overwrite findOne to add { deletedAt: null } to criteria
+       * Overwrite findOne to add { deleted_at: null } to criteria
        */
       Model.findOne = function (criteria) {
         criteria = addDeletedAtToCriteria(criteria, null, Model.primaryKey);
@@ -104,18 +104,18 @@ module.exports = function defineSoftDeleteHook(sails) {
 
       /**
        * Overwrite the default destroy to just update matched records
-       * By setting deletedAt to current timestamp
+       * By setting deleted_at to current timestamp
        */
       Model.destroy = function (criteria) {
-        return update.call(this, criteria, { deletedAt: Date.now() });
+        return update.call(this, criteria, { deleted_at: Date.now() });
       };
 
       /**
        * Overwrite the default destroyOne to just update the record
-       * By setting deletedAt to current timestamp
+       * By setting deleted_at to current timestamp
        */
       Model.destroyOne = function (criteria) {
-        return updateOne.call(this, criteria, { deletedAt: Date.now() });
+        return updateOne.call(this, criteria, { deleted_at: Date.now() });
       };
 
       /**
@@ -125,17 +125,17 @@ module.exports = function defineSoftDeleteHook(sails) {
       Model.forceDestroyOne = destroyOne.bind(Model);
 
       /**
-       * Restore matched records. Aka set deletedAt to null
+       * Restore matched records. Aka set deleted_at to null
        */
       Model.restore = function (criteria) {
-        return update.call(this, criteria, { deletedAt: null });
+        return update.call(this, criteria, { deleted_at: null });
       };
 
       /**
        * Restore matched record.
        */
       Model.restoreOne = function (criteria) {
-        return updateOne.call(this, criteria, { deletedAt: null });
+        return updateOne.call(this, criteria, { deleted_at: null });
       };
     }
   };
