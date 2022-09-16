@@ -15,6 +15,16 @@ yarn add sails-hook-soft-delete
 
 ## Usage
 
+### Setting up the model.js file
+```javascript
+ attributes: {
+    created_at: { type: 'number', autoCreatedAt: true, columnName: 'created_at'},
+    updated_at: { type: 'number', autoUpdatedAt: true, columnName: 'updated_at'},
+    deleted_at: { type: 'ref', defaultsTo: null, columnName: 'deleted_at'},
+    id: { type: 'number', autoIncrement: true, columnName: 'id'},
+    }
+```
+
 ### Deleting record
 
 Now the `Model.destroyOne()` method will mark the record as soft-deleted. It set the deletedAt attribute to current date.
